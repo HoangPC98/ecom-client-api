@@ -3,14 +3,15 @@ import { AppModule } from './app.module';
 import { ILoggerService } from './common/logger/adapter';
 import { GatewayInterceptor } from './common/interceptors/with-token.interceptor';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
-import { AllExceptionFilter } from './common/filters/all-exception.filter';
 import { MicroserviceOptions, RmqOptions, Transport } from '@nestjs/microservices';
-import { MESSSAGE_SERVICE_QUEUE, rabbitmqUri } from 'src/providers/queue';
+import { rabbitmqUri } from 'src/providers/queue';
+import { PROTO_PATH_CUSTOMER_AUTH,  PROTO_PATH_CUSTOMER } from './common/constants/index.contant';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const appName = 'GatewayAPI';
-  const appPort = +process.env.APP_PORT;
+  const appPort = process.env.REST_API_PORT || 8080;
+  const rpcEndpoint = `${process.env.APP_HOST}:${process.env.RPC_PORT}` || 'localhost:5001';
   const options = {
     origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
@@ -18,23 +19,20 @@ async function bootstrap() {
     optionsSuccessStatus: 200,
     credentials: true,
   };
-
+  // const pathOut = SUBMODULE_OUTSIDE_REPO_PATH;
+  // console.log('pathOut', pathOut);
   const loggerService = app.get(ILoggerService);
   app.useLogger(loggerService);
-
   // app.enableVersioning({
   //   type: VersioningType.URI,
   // });
-
   app.enableCors(options);
   app.useGlobalInterceptors(new GatewayInterceptor(loggerService));
-
   // app.useGlobalFilters(new AllExceptionFilter(loggerService));
 
   app.useGlobalPipes(
     new ValidationPipe({
       enableDebugMessages: true,
-      // stopAtFirstError: true
     }),
   );
 
@@ -51,22 +49,14 @@ async function bootstrap() {
       prefetchCount: 1
     },
   } as RmqOptions);
-
+  console.log('rpcEndpoint', rpcEndpoint);
+  
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.GRPC,
     options: { 
-      package: 'subcriber',
-      protoPath: 'src/proto/subcriber.proto',
-      url: 'localhost:50050',
-    },
-  });
-
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.GRPC,
-    options: { 
-      package: 'customer',
-      protoPath: 'src/proto/customer.proto',
-      url: 'localhost:50052',
+      package: 'Customer',
+      protoPath: PROTO_PATH_CUSTOMER,
+      url: rpcEndpoint,
     },
   });
 

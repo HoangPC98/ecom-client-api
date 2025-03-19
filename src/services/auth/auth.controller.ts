@@ -27,7 +27,9 @@ import { GoogleOAuthGuard } from './guards/google-oauth.guard';
 })
 @ApiTags('Auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+  ) {}
 
   @ApiHeaders([
     {
@@ -114,6 +116,8 @@ export class AuthController {
   async loginByGoogleRedirect() {
     await this.authService.googleRedirect();
   }
+
+  
   // @Post('login-new-device')
   // @Public()
   // @ApiBody({

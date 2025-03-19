@@ -80,7 +80,7 @@ export class AuthBaseService {
       throw new ForbiddenException(ErrorMessage.USER_IS_TEMP_LOCK);
     }
     if (!passwordMatch) {
-      let currentCount = +(await this.cacheProvider.get(ckey));
+      let currentCount = (await this.cacheProvider.get(ckey) as number);
       if (!currentCount) {
         currentCount = 0;
       }
@@ -132,7 +132,7 @@ export class AuthBaseService {
       id: sid,
       uid: uid,
       refresh_token: refreshToken,
-      device_id: deviceId || null,
+      device_id: deviceId || undefined,
     });
     await this.userRepository.session.save(newSession);
     await this.cacheProvider.storeSession(newSession);
@@ -145,7 +145,14 @@ export class AuthBaseService {
 
   async getSession(sid: string): Promise<Session> {
     let session = await this.cacheProvider.getSession(sid);
-    if (!session) session = await this.userRepository.session.findOneBy({ id: sid });
+    if (!session) {
+      const foundSession = await this.userRepository.session.findOneBy({ id: sid });
+      if (foundSession) {
+        session = foundSession;
+      } else {
+        throw new Error('Session not found');
+      }
+    }
     return session;
   }
 
@@ -160,7 +167,7 @@ export class AuthBaseService {
       uid: user.id || user.id,
       active: user.active,
       sid: sid,
-      lastLoginAt: null,
+      lastLoginAt: new Date(),
     };
 
     const accessToken = this.jwtService.sign(accessTokenPayload, this.jwtAccessTokenOption);

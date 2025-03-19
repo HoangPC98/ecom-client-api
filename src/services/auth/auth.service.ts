@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 import { SignUpReq } from './dto/login.dto';
 import { GetRefreshTokenResp, UserAuthJwtDto } from './dto/token.dto';
@@ -8,17 +8,19 @@ import { ErrorMessage } from 'src/common/enums/error.enum';
 import { AccType, EOtpType, UsrType } from 'src/common/enums/auth.enum';
 import { checkPhoneOrEmail } from 'src/common/utils/auth.util';
 import { OtpObjValue } from 'src/common/types/auth.type';
-import amqp, { Channel, Connection } from "amqplib";
-import { rabbitmqUri } from 'src/providers/queue';
 
 dotenv.config();
 
 @Injectable()
 export class AuthService extends AuthBaseService {
- 
-  async loginByUsr(usr: string, password: string, deviceId?: string): Promise<ILoginResp> {
+  async loginByUsr(usr: string, password: string, deviceId?: string): Promise<any> {
     const user = await this.userRepository.findOneBy({ usr });
-    if (!user) throw new BadRequestException(ErrorMessage.USER_NOT_EXIST);
+    if (!user) return {
+      access_token: 'string',
+      refresh_token: 'admin',
+      fcm_token: 'asdf',
+      session_expired_in: 'string'
+    } 
     await this.handleLoginCredit(user, password);
     let tokens: IGetTokenRes;
     let checkSession = await this.userRepository.session.findOne({
@@ -120,4 +122,5 @@ export class AuthService extends AuthBaseService {
     const validate = await this.otpProvider.validate(phoneOrEmail, value, id);
     return validate;
   }
+
 }

@@ -4,7 +4,9 @@ import { plainToInstance } from 'class-transformer';
 // import { PageOptionsDto } from 'libs/common/src';
 import { FindOneOptions, FindOptionsOrder, FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 
-export abstract class BaseAbstractRepository<T> extends Repository<T> {
+import { ObjectLiteral } from 'typeorm';
+
+export abstract class BaseAbstractRepository<T extends ObjectLiteral> extends Repository<T> {
   private repository: Repository<T>;
 
   protected constructor(repository: Repository<T>) {

@@ -9,22 +9,23 @@ import { AppConfigModule } from './configs/app.config.module';
 import { MyCacheModule } from './providers/cache/cache.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-store';
-import { UserModule } from './services/customer/user.module';
 import { APP_GUARD } from '@nestjs/core';
 import { ClientJwtAuthGuard } from './services/auth/guards/jwt.auth.guard';
 import { QueueModule } from './providers/queue/queue.module';
 import { MESSSAGE_SERVICE_QUEUE } from './providers/queue';
 import { ClientProxyFactory, ClientsModule, Transport } from '@nestjs/microservices';
 import { join } from 'path';
-import { GrpcModule } from './services/customer/customer.rpc.module';
+import { CustomerClientService } from './services/grpc/grpc-client.service';
+import { CustomerModule } from './services/customer/customer.module';
 
 @Module({
   imports: [
     DatabaseModule,
     AuthModule,
-    UserModule,
+    // UserModule,
     AppConfigModule,
-    GrpcModule,
+    CustomerModule,
+    // CustomerGrpcModule,
     LoggerModule.regisProviders({
       provide: ILoggerService,
       useFactory: () => {
@@ -35,30 +36,24 @@ import { GrpcModule } from './services/customer/customer.rpc.module';
     // QueueModule.subcribe([
     //   { name: MESSSAGE_SERVICE_QUEUE }
     // ]),
-    ClientsModule.register([
-      {
-        name: 'SUBCRIBER_PACKAGE',
-        transport: Transport.GRPC,
-        options: {
-          package: 'subcriber',
-          protoPath: 'src/proto/subcriber.proto',
-        },
-      },
-      {
-        name: 'CUSTOMER_PACKAGE',
-        transport: Transport.GRPC,
-        options: {
-          package: 'customer',
-          protoPath: 'src/proto/customer.proto',
-        },
-      },
-    ])
+    // ClientsModule.register([
+    //   {
+    //     name: 'CUSTOMER_CLIENT',
+    //     transport: Transport.GRPC,
+    //     options: {
+    //       url: 'localhost:5001',
+    //       package: 'Customer',
+    //       protoPath: PROTO_PATH_CUSTOMER_AUTH,
+    //     },
+    //   },
+    // ])
   ],
   providers: [
     {
       provide: APP_GUARD,
       useClass: ClientJwtAuthGuard,
     },
+    // CustomerClientService
     // {
     //   provide: MESSSAGE_SERVICE_QUEUE,
     //   useFactory: ({ messageServiceConnection }: AppConfigService) => {

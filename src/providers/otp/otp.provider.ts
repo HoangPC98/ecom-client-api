@@ -15,9 +15,9 @@ dotEnv.config();
 export class OtpProvider {
   // Thời gian OTP hết hiệu lực
   private readonly otpExpireTime = process.env.OTP_EXPIRE_TIME;
-  private readonly otpByPassAll: string = process.env.OTP_BY_PASS_ALL;
-  private readonly otpCodeBypassDf: string = process.env.OTP_CODE_BYPASS_DF || null;
-  private readonly otpWrongCountLitmit: number = Number.parseInt(process.env.OTP_WRONG_COUNT_LIMIT);
+  private readonly otpByPassAll: string = process.env.OTP_BY_PASS_ALL || 'false';
+  private readonly otpCodeBypassDf: string = process.env.OTP_CODE_BYPASS_DF || '111111';
+  private readonly otpWrongCountLitmit: number = Number.parseInt(process.env.OTP_WRONG_COUNT_LIMIT || '3');
 
   // Thời gian OTP được lưu trữ lại để kiểm tra
 
@@ -35,12 +35,15 @@ export class OtpProvider {
     if (!cacheOtp) {
       throw new BadRequestException(ErrorMessage.OTP_EXPIRED);
     }
+    else {
+      
+    }
 
     if (cacheOtp.wrong_count && cacheOtp.wrong_count >= this.otpWrongCountLitmit)
       throw new BadRequestException(ErrorMessage.WRONG_OTP_TO_MUCH);
 
     if (otp == cacheOtp.value && trackingId == cacheOtp.id) {
-      await this.cacheProvider.removeOtp(cacheOtp.key);
+      await this.cacheProvider.removeOtp(cacheOtp?.key || '');
       return true;
     } else {
       cacheOtp.wrong_count = cacheOtp.wrong_count ? (cacheOtp.wrong_count += 1) : 1;
