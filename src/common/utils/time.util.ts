@@ -3,6 +3,7 @@ export const mapTimeToSecondFromStrDHM = (string: string, milisecond?: any): num
   if (string.includes('d')) return Number(string.split('d')[0]) * 24 * 3600 * unit;
   else if (string.includes('h')) return Number(string.split('h')[0]) * 3600 * unit;
   else if (string.includes('m')) return Number(string.split('m')[0]) * 60 * unit;
+  return 0;
 };
 
 // export const mapTimeInSecondToDHM = (dhm: string): string => {

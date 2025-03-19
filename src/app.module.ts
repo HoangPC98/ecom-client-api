@@ -17,6 +17,8 @@ import { MESSSAGE_SERVICE_QUEUE } from './providers/queue';
 import { ClientProxyFactory, ClientsModule, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { GrpcModule } from './services/customer/customer.rpc.module';
+import { PROTO_PATH } from './common/constants/index.contant';
+import { CustomerClientService } from './services/grpc/grpc-client.service';
 
 @Module({
   imports: [
@@ -37,19 +39,12 @@ import { GrpcModule } from './services/customer/customer.rpc.module';
     // ]),
     ClientsModule.register([
       {
-        name: 'SUBCRIBER_PACKAGE',
+        name: 'CUSTOMER_CLIENT',
         transport: Transport.GRPC,
         options: {
-          package: 'subcriber',
-          protoPath: 'src/proto/subcriber.proto',
-        },
-      },
-      {
-        name: 'CUSTOMER_PACKAGE',
-        transport: Transport.GRPC,
-        options: {
-          package: 'customer',
-          protoPath: 'src/proto/customer.proto',
+          url: 'localhost:5001',
+          package: 'Customer',
+          protoPath: PROTO_PATH,
         },
       },
     ])
@@ -59,6 +54,7 @@ import { GrpcModule } from './services/customer/customer.rpc.module';
       provide: APP_GUARD,
       useClass: ClientJwtAuthGuard,
     },
+    CustomerClientService
     // {
     //   provide: MESSSAGE_SERVICE_QUEUE,
     //   useFactory: ({ messageServiceConnection }: AppConfigService) => {

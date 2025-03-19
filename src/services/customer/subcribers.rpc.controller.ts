@@ -13,12 +13,10 @@ export class SubscribersService {
   //     private subscribersRepository: Repository<Subscriber>,
   //   ) {}
 
-  @GrpcMethod()
   async addSubscriber(subscriber: any) {
     return { message: 'Subscriber added' };
   }
 
-  @GrpcMethod()
   async getAllSubscribers(subscriber: any) {
     console.log('subcriber...', subscriber);
     const subscribers = [

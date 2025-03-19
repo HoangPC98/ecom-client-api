@@ -28,7 +28,9 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, TOKEN_TYPE.A
 
   async validate(payload: IClientJwtPayload): Promise<IClientJwtPayload> {
     const { uid, sid, active, device_id }: IUserAuth = payload;
-    const checkSession = await this.authService.validateSession(uid, sid);
+    // const checkSession = await this.authService.validateSession(uid, sid);
+    const checkSession = undefined;
+    
     if (!checkSession) throw new UnauthorizedException(ErrorMessage.SESSION_EXPIRED);
     const user = { ...payload };
     return user;

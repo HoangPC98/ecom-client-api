@@ -27,7 +27,9 @@ import { GoogleOAuthGuard } from './guards/google-oauth.guard';
 })
 @ApiTags('Auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+  ) {}
 
   @ApiHeaders([
     {
@@ -56,63 +58,69 @@ export class AuthController {
       },
     },
   ])
-  @Post('sign-up/by-usr')
-  @Public()
-  async signUp(@Body() signUpDto: SignUpReq, @Req() request: Request): Promise<any> {
-    return await this.authService.signUpByUsr(signUpDto);
-  }
+  // @Post('sign-up/by-usr')
+  // @Public()
+  // async signUp(@Body() signUpDto: SignUpReq, @Req() request: Request): Promise<any> {
+  //   return await this.authService.signUpByUsr(signUpDto);
+  // }
 
-  @Post('login/by-usr')
-  @Public()
-  @ApiBody({
-    description: 'Username and password',
-    type: LoginByUsrPwdReq,
-  })
-  async login(@Body() { usr, password }: LoginByUsrPwdReq, @DeviceIdLogged() deviceId: string): Promise<any> {
-    return this.authService.loginByUsr(usr, password, deviceId);
-  }
+  // @Post('login/by-usr')
+  // @Public()
+  // @ApiBody({
+  //   description: 'Username and password',
+  //   type: LoginByUsrPwdReq,
+  // })
+  // async login(@Body() { usr, password }: LoginByUsrPwdReq, @DeviceIdLogged() deviceId: string): Promise<any> {
+  //   return this.authService.loginByUsr(usr, password, deviceId);
+  // }
 
-  @Get('logout')
-  async logout(@UserLogged() user: IUserAuth): Promise<void> {
-    return this.authService.logout(user);
-  }
+  // @Get('logout')
+  // async logout(@UserLogged() user: IUserAuth): Promise<void> {
+  //   return this.authService.logout(user);
+  // }
 
-  @Post('refresh-token')
-  @Public()
-  async refreshToken(@Body() body: GetRefreshTokenReq): Promise<GetRefreshTokenResp> {
-    return this.authService.getRefreshToken(body.refreshToken);
-  }
+  // @Post('refresh-token')
+  // @Public()
+  // async refreshToken(@Body() body: GetRefreshTokenReq): Promise<GetRefreshTokenResp> {
+  //   return this.authService.getRefreshToken(body.refreshToken);
+  // }
 
-  @Post('check-phone-or-email')
-  @Public()
-  async checkPhoneOrEmail(@Body() body: ICheckPhoneOrEmailReq): Promise<any> {
-    return await this.authService.checkPhoneOrEmail(body.usr, body.forSignUp);
-  }
+  // @Post('check-phone-or-email')
+  // @Public()
+  // async checkPhoneOrEmail(@Body() body: ICheckPhoneOrEmailReq): Promise<any> {
+  //   return await this.authService.checkPhoneOrEmail(body.usr, body.forSignUp);
+  // }
 
-  @Post('get-otp/no-auth')
-  @Public()
-  async getOtpNoAuth(@Body() body: GetOtpReq) {
-    return await this.authService.sendOtp(body.usr, body.otpType);
-  }
+  // @Post('get-otp/no-auth')
+  // @Public()
+  // async getOtpNoAuth(@Body() body: GetOtpReq) {
+  //   return await this.authService.sendOtp(body.usr, body.otpType);
+  // }
 
-  @Post('verify-otp/no-auth')
-  @Public()
-  async verifyOtp(@Body() body: any) {
-    return await this.authService.checkOtp(body.usr, body.value, body.id);
-  }
+  // @Post('verify-otp/no-auth')
+  // @Public()
+  // async verifyOtp(@Body() body: any) {
+  //   return await this.authService.checkOtp(body.usr, body.value, body.id);
+  // }
 
-  @Post('oauth/google')
-  @UseGuards(GoogleOAuthGuard)
-  @Public()
-  async loginByGoogleOAuth(@Body() body: LoginByGoogleReq) {
-    await this.authService.loginByGoogle(body.email);
-  }
+  // @Post('oauth/google')
+  // @UseGuards(GoogleOAuthGuard)
+  // @Public()
+  // async loginByGoogleOAuth(@Body() body: LoginByGoogleReq) {
+  //   await this.authService.loginByGoogle(body.email);
+  // }
 
-  @Get('oauth/google-redirect')
-  @UseGuards(AuthGuard('google'))
+  // @Get('oauth/google-redirect')
+  // @UseGuards(AuthGuard('google'))
+  // @Public()
+  // async loginByGoogleRedirect() {
+  //   await this.authService.googleRedirect();
+  // }
+
+  @Get('customer-grpc')
   @Public()
-  async loginByGoogleRedirect() {
-    await this.authService.googleRedirect();
+  async getCustomerGrpc() {
+    await this.authService.callRpcClient()
   }
   // @Post('login-new-device')
   // @Public()

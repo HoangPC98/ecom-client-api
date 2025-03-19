@@ -70,15 +70,15 @@ export class LoggerService implements ILoggerService {
   }
 
   trace({ message, context, obj = {} }: MessageType): void {
-    this.pino.logger.trace([obj, gray(message)].find(Boolean));
+    this.pino.logger.trace([obj, message ? gray(message) : undefined].find(Boolean) || '');
   }
 
   info({ message, context, obj }: MessageType): void {
-    this.pino.logger.info([{ message, context, obj }, green(message)].find(Boolean));
+    this.pino.logger.info([{ message, context, obj }, message ? green(message) : undefined].find(Boolean) || '');
   }
 
   warn({ message, context, obj = {} }: MessageType): void {
-    this.pino.logger.warn([obj, yellow(message)].find(Boolean));
+    this.pino.logger.warn([obj, yellow(message || 'No message provided')].find(Boolean) || 'No message provided');
   }
 
   error(error: ErrorType, message?: string, context?: string, request?: any): void {
@@ -104,19 +104,19 @@ export class LoggerService implements ILoggerService {
       traceid: this.getTraceId(error),
       stack: error?.stack,
     };
-    this.pino.logger.error([logObj, red(message)].find(Boolean));
+    this.pino.logger.error([logObj, message ? red(message) : ''].find(Boolean) || '');
   }
 
   fatal(error: ErrorType, message?: string, context?: string): void {
     this.pino.logger.fatal(
       {
         ...(error.getResponse() as object),
-        context: [context, this.app].find(Boolean),
+        context: [context, this.app].find(Boolean) || '',
         type: error.name,
         traceid: this.getTraceId(error),
         stack: error?.stack,
       },
-      red(message),
+      message ? red(message) : '',
     );
   }
 
@@ -131,7 +131,7 @@ export class LoggerService implements ILoggerService {
         return `request ${red(error.name)} with status code: ${res.statusCode} `;
       },
       genReqId: (req: IncomingMessage) => {
-        return req.headers.traceid;
+        return req.headers.traceid || uuidv4();
       },
       customAttributeKeys: {
         // req: 'request',

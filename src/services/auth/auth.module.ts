@@ -20,6 +20,9 @@ import { MESSSAGE_SERVICE_QUEUE } from 'src/providers/queue';
 import { ClientProxyFactory, Transport } from '@nestjs/microservices';
 import { AccessTokenStrategy } from './strategies/access-token.strategy';
 import { QueueMessageService } from 'src/providers/queue/queue.message.service';
+import { CustomersService } from '../customer/customers.rpc.controller';
+import { CustomerClientService } from '../grpc/grpc-client.service';
+import { PROTO_PATH } from 'src/common/constants/index.contant';
 
 dotenv.config();
 
@@ -46,6 +49,7 @@ dotenv.config();
     OtpProvider,
     QueueService,
     QueueMessageService,
+    CustomerClientService,
     {
       provide: MESSSAGE_SERVICE_QUEUE,
       useFactory: ({ messageServiceConnection }: AppConfigService) => {
@@ -56,8 +60,31 @@ dotenv.config();
       },
       inject: [AppConfigService],
     },
+    {
+      provide: MESSSAGE_SERVICE_QUEUE,
+      useFactory: ({ messageServiceConnection }: AppConfigService) => {
+        return ClientProxyFactory.create({
+          transport: Transport.RMQ,
+          options: messageServiceConnection,
+        });
+      },
+      inject: [AppConfigService],
+    },
+    {
+      provide: 'CUSTOMER_CLIENT',
+      useFactory: () => {
+        return ClientProxyFactory.create({
+          transport: Transport.GRPC,
+          options: {
+            url: 'localhost:5001',
+            package: 'Customer',
+            protoPath: PROTO_PATH,
+          },
+        });
+      },
+    }
   ],
   controllers: [AuthController],
   exports: [AuthService, AccessTokenStrategy],
 })
-export class AuthModule {}
+export class AuthModule { }
