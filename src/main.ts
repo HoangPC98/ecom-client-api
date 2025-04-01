@@ -11,7 +11,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const appName = 'GatewayAPI';
   const appPort = process.env.REST_API_PORT || 8080;
-  const rpcEndpoint = `${process.env.APP_HOST}:${process.env.RPC_PORT}` || 'localhost:5001';
+  const rpcEndpoint =  '0.0.0.0:5001';
   const options = {
     origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
@@ -27,7 +27,7 @@ async function bootstrap() {
   //   type: VersioningType.URI,
   // });
   app.enableCors(options);
-  app.useGlobalInterceptors(new GatewayInterceptor(loggerService));
+  // app.useGlobalInterceptors(new GatewayInterceptor(loggerService));
   // app.useGlobalFilters(new AllExceptionFilter(loggerService));
 
   app.useGlobalPipes(

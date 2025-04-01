@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, Inject, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, Inject, UnauthorizedException, Catch } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { JwtSignOptions } from '@nestjs/jwt/dist/interfaces';
 import * as bcrypt from 'bcrypt';
@@ -27,10 +27,12 @@ import { MESSSAGE_SERVICE_QUEUE, QUEUE_PUSH_NOTIF, QUEUE_SEND_SMS, rabbitmqUri, 
 import { Channel, Connection } from "amqplib";
 import amqp, { ChannelWrapper } from 'amqp-connection-manager';
 import { QueueMessageService } from 'src/providers/queue/queue.message.service';
+import { RpcException } from '@nestjs/microservices';
 
 dotenv.config();
 
 @Injectable()
+@Catch()
 export class AuthBaseService {
   private readonly jwtAccessTokenOption: JwtSignOptions = {};
   private readonly jwtRefreshTokenOption: JwtSignOptions = {};
@@ -67,17 +69,17 @@ export class AuthBaseService {
     });
   }
 
-  public async handleLoginCredit(user: User, password: string): Promise<void> {
+  public async handleLoginCredit(user: User, password: string): Promise<any> {
     const passwordMatch = await bcrypt.compare(password, user.password);
     const isTempLocked = user.state?.isTempLock == true || false;
     const isLocked = user.state?.isLock == true || false;
     const ckey = `${WRONG_PASSWORD_COUNT}${user.id}`;
     if (isLocked || user.isDeleted()) {
-      throw new ForbiddenException(ErrorMessage.USER_IS_TEMP_LOCK);
+      throw new RpcException(ErrorMessage.USER_IS_TEMP_LOCK);
     }
-
+    return true;
     if (isTempLocked) {
-      throw new ForbiddenException(ErrorMessage.USER_IS_TEMP_LOCK);
+      throw new RpcException(ErrorMessage.USER_IS_TEMP_LOCK);
     }
     if (!passwordMatch) {
       let currentCount = (await this.cacheProvider.get(ckey) as number);
@@ -94,7 +96,7 @@ export class AuthBaseService {
               reasonLockType: EUserReasonLockType.WRONG_PASSWORD_TO_MUCH,
             },
           });
-          throw new ForbiddenException(reasonLock);
+          throw new RpcException(reasonLock);
         } else {
           reasonLock = ErrorMessage.USER_IS_TEMP_LOCK;
           await this.cacheProvider.del(ckey);
@@ -106,11 +108,11 @@ export class AuthBaseService {
               reasonLockDesc: reasonLock,
             },
           });
-          throw new ForbiddenException(reasonLock);
+          throw new RpcException(reasonLock);
         }
       } else {
         await this.cacheProvider.set(ckey, currentCount + 1, this.tempLockDuration);
-        throw new ForbiddenException(`Wrong password many time, attempt remaining : ${remainingCount}`);
+        throw new RpcException(`Wrong password many time, attempt remaining : ${remainingCount}`);
       }
     }
   }

@@ -23,22 +23,18 @@ export class AuthService extends AuthBaseService {
     } 
     await this.handleLoginCredit(user, password);
     let tokens: IGetTokenRes;
-    let checkSession = await this.userRepository.session.findOne({
-      where: { device_id: deviceId },
-    });
-    if (!checkSession) {
-      const sid = this.generateNewSid();
-      tokens = await this.getClientTokens(user, sid);
-      checkSession = await this.createNewSession(user.id, sid, tokens.refreshToken, deviceId);
-    } else {
-      tokens = await this.getClientTokens(user, checkSession.id);
-    }
+    // let checkSession = await this.userRepository.session.findOne({
+    //   where: { device_id: deviceId },
+    // });
+    // if (!checkSession) {
+    //   const sid = this.generateNewSid();
+    //   tokens = await this.getClientTokens(user, sid);
+    //   checkSession = await this.createNewSession(user.id, sid, tokens.refreshToken, deviceId);
+    // } else {
+    //   tokens = await this.getClientTokens(user, checkSession.id);
+    // }
 
-    return {
-      ...tokens,
-      sid: checkSession.id,
-      accType: AccType.CLIENT,
-    };
+    return true;
   }
 
   async loginByGoogle(email: string) {
