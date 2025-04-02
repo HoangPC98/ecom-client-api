@@ -20,7 +20,6 @@ import { AccessTokenStrategy } from './strategies/access-token.strategy';
 import { QueueMessageService } from 'src/providers/queue/queue.message.service';
 import { CustomerClientService } from '../grpc/grpc-client.service';
 import { PROTO_PATH_CUSTOMER_AUTH, PROTO_PATH_CUSTOMER} from 'src/common/constants/index.contant';
-import { CustomerAuthService } from './customer-auth-service.controller';
 
 dotenv.config();
 
@@ -69,7 +68,7 @@ dotenv.config();
       inject: [AppConfigService],
     },
   ],
-  controllers: [CustomerAuthService],
+  controllers: [],
   exports: [AuthService, AccessTokenStrategy],
 })
 export class AuthModule {}

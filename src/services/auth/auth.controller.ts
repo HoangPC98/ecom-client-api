@@ -5,7 +5,7 @@ import { Request } from 'express';
 
 // import { RefreshTokenBodyPayload, RefreshTokenResponse } from '@/modules/auth/dto/auth.dto';
 import { AuthService } from './auth.service';
-import { LoginByGoogleReq, LoginByUsrPwdReq, SignUpByUsrReq, SignUpReq } from './dto/login.dto';
+import { LoginByGoogleReq, LoginByUsrPwdReq, SignUpReq } from './dto/login.dto';
 import { DeviceIdLogged, Public, UserLogged } from 'src/common/decorators/auth.decorator';
 import { GetRefreshTokenReq, GetRefreshTokenResp, UserAuthJwtDto } from './dto/token.dto';
 import { GetOtpReq, ICheckPhoneOrEmailReq } from './dto/validate.auth.dto';

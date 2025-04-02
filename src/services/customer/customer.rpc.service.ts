@@ -5,15 +5,15 @@ import { Repository } from 'typeorm';
 import { GrpcMethod } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
-import { LoginByUsrPwdReq } from '../auth/dto/login.dto';
-import { ILoginResp } from 'src/common/interfaces/auth.interface';
+import { LoginByUsrPwdReq, SignUpReq } from '../auth/dto/login.dto';
+import { ILoginResp, ISignUpRes } from 'src/common/interfaces/auth.interface';
 
 @Controller()
 // export class CustomerService implements ICustomerService {
 export class CustomerService {
   constructor(
     private readonly authService: AuthService,
-  ) {}
+  ) { }
 
   @GrpcMethod()
   async login(dto: LoginByUsrPwdReq): Promise<any> {
@@ -30,6 +30,13 @@ export class CustomerService {
       { id: '2', title: 'kara123@gmail.com', body: 'no body 23', postImage: 'https://www.google.com' }
     ]
     return { news };
+  }
+
+  @GrpcMethod()
+  async signUp(dto: SignUpReq): Promise<ISignUpRes> {
+    console.log('DTO...SignUp...', dto)
+    const res = this.authService.signUpByUsr(dto)
+    return res;
   }
 
   @GrpcMethod()

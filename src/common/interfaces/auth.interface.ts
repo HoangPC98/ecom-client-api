@@ -20,9 +20,13 @@ export interface IGetTokenRes {
   refreshToken: string;
 }
 
-export interface ILoginResp extends IGetTokenRes {
-  sid: string;
+export interface ILoginResp {
   accType: 'admin' | 'client';
   fcm_token?: string;
   session_expired_in?: string;
+}
+
+export interface ISignUpRes {
+  uid: string | number;
+  status: boolean;
 }

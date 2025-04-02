@@ -25,7 +25,7 @@ export class SignUpReq {
   @ApiProperty({
     example: '0123456789',
   })
-  phoneOrEmail: string;
+  usr: string;
 
   @IsNotEmpty()
   @ApiProperty({
@@ -37,25 +37,19 @@ export class SignUpReq {
   @ApiProperty({
     example: '123456',
   })
-  otpCode: string;
-
-  @IsNotEmpty()
-  @ApiProperty({
-    example: 'e570afd9-3f01-4461-84eb-46c2c17e8f',
-  })
-  otpId: string;
+  invite_code: string;
 }
 
-export class SignUpByUsrReq extends SignUpReq {
-  @IsOptional()
-  @ApiProperty({
-    example: '0987654321',
-  })
-  phoneNumber: string;
+// export class SignUpByUsrReq extends SignUpReq {
+//   @IsOptional()
+//   @ApiProperty({
+//     example: '0987654321',
+//   })
+//   usr: string;
 
-  @IsOptional()
-  @ApiProperty({
-    example: 'abc123@gmail.com',
-  })
-  email: string;
-}
+//   @IsOptional()
+//   @ApiProperty({
+//     example: 'abc123@gmail.com',
+//   })
+//   email: string;
+// }

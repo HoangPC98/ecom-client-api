@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv';
 import { SignUpReq } from './dto/login.dto';
 import { GetRefreshTokenResp, UserAuthJwtDto } from './dto/token.dto';
 import { AuthBaseService } from './auth.base.service';
-import { IGetTokenRes, ILoginResp, IUserAuth } from 'src/common/interfaces/auth.interface';
+import { IGetTokenRes, ILoginResp, ISignUpRes, IUserAuth } from 'src/common/interfaces/auth.interface';
 import { ErrorMessage } from 'src/common/enums/error.enum';
 import { AccType, EOtpType, UsrType } from 'src/common/enums/auth.enum';
 import { checkPhoneOrEmail } from 'src/common/utils/auth.util';
@@ -45,15 +45,14 @@ export class AuthService extends AuthBaseService {
     console.log('REDIRECT LOGIC...');
   }
 
-  async signUpByUsr(dto: SignUpReq) {
-    const { phoneOrEmail, otpCode, password, otpId } = dto;
-    const user = await this.userRepository.findOneBy({ usr: dto.phoneOrEmail });
+  async signUpByUsr(dto: SignUpReq): Promise<ISignUpRes> {
+    const { usr, password, invite_code } = dto;
+    const user = await this.userRepository.findOneBy({ usr: dto.usr });
     if (user) throw new BadRequestException(ErrorMessage.USR_IS_EXISTED);
-    await this.otpProvider.validate(phoneOrEmail, otpCode, otpId);
 
-    await this.checkPhoneOrEmail(dto.phoneOrEmail, 1);
+    await this.checkPhoneOrEmail(dto.usr, 1);
     let newUser = this.userRepository.account.create({
-      usr: dto.phoneOrEmail,
+      usr: dto.usr,
       password: this.setPasswordHash(dto.password),
     });
 
@@ -63,7 +62,10 @@ export class AuthService extends AuthBaseService {
       uid: newUser.id,
     });
     await this.userRepository.profile.save(newProfile);
-    return;
+    return {
+      status: true,
+      uid: newUser.id,
+    };
   }
 
   async getRefreshToken(refreshToken: string): Promise<GetRefreshTokenResp> {

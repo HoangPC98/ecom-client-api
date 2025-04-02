@@ -77,7 +77,7 @@ export class AuthBaseService {
     if (isLocked || user.isDeleted()) {
       throw new RpcException(ErrorMessage.USER_IS_TEMP_LOCK);
     }
-    return true;
+    // return true;
     if (isTempLocked) {
       throw new RpcException(ErrorMessage.USER_IS_TEMP_LOCK);
     }
