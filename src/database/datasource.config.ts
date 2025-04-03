@@ -14,7 +14,7 @@ export const customerDatabaseConfig: PostgresConnectionOptions = {
   entities: ['dist/entities/user-entity/*.entity.js'],
   synchronize: false,
   logging: process.env.DATABASE_LOGGING ? true : false,
-  // migrationsRun: true,
+  migrationsRun: true,
   migrations: ['dist/database/migrations/*{.ts,.js}'],
 };
 

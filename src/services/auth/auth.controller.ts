@@ -64,20 +64,15 @@ export class AuthController {
     return await this.authService.signUpByUsr(signUpDto);
   }
 
-  @Post('login/by-usr')
-  @Public()
-  @ApiBody({
-    description: 'Username and password',
-    type: LoginByUsrPwdReq,
-  })
-  async login(@Body() { usr, password }: LoginByUsrPwdReq, @DeviceIdLogged() deviceId: string): Promise<any> {
-    return this.authService.loginByUsr(usr, password, deviceId);
-  }
-
-  @Get('logout')
-  async logout(@UserLogged() user: IUserAuth): Promise<void> {
-    return this.authService.logout(user);
-  }
+  // @Post('login/by-usr')
+  // @Public()
+  // @ApiBody({
+  //   description: 'Username and password',
+  //   type: LoginByUsrPwdReq,
+  // })
+  // async login(@Body() { usr, password }: LoginByUsrPwdReq, @DeviceIdLogged() deviceId: string): Promise<any> {
+  //   return this.authService.loginByUsr(usr, password, deviceId);
+  // }
 
   @Post('refresh-token')
   @Public()

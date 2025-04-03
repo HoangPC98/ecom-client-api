@@ -17,9 +17,7 @@ import { CacheProvider } from 'src/providers/cache/cache.provider';
 import { ILoggerService } from 'src/common/logger/adapter';
 import { EOtpType, EUserReasonLockType } from 'src/common/enums/auth.enum';
 import { OtpObjValue, UserAuthJwtPayload } from 'src/common/types/auth.type';
-import { BOOLEAN_VALUE, TOKEN_TYPE } from 'src/common/enums/index.enum';
 import { IClientJwtPayload, IGetTokenRes, IUserAuth } from 'src/common/interfaces/auth.interface';
-import { Session } from 'src/entities/user-entity/session.entity';
 import { plainToClass, plainToInstance } from 'class-transformer';
 import { OtpProvider } from 'src/providers/otp/otp.provider';
 import { QueueService, } from 'src/providers/queue/queue.service';
@@ -27,7 +25,7 @@ import { MESSSAGE_SERVICE_QUEUE, QUEUE_PUSH_NOTIF, QUEUE_SEND_SMS, rabbitmqUri, 
 import { Channel, Connection } from "amqplib";
 import amqp, { ChannelWrapper } from 'amqp-connection-manager';
 import { QueueMessageService } from 'src/providers/queue/queue.message.service';
-import { RpcException } from '@nestjs/microservices';
+import { GrpcForbbienException } from 'src/common/exceptions/grpc.exception';
 
 dotenv.config();
 
@@ -75,11 +73,11 @@ export class AuthBaseService {
     const isLocked = user.state?.isLock == true || false;
     const ckey = `${WRONG_PASSWORD_COUNT}${user.id}`;
     if (isLocked || user.isDeleted()) {
-      throw new RpcException(ErrorMessage.USER_IS_TEMP_LOCK);
+      throw new GrpcForbbienException(ErrorMessage.USER_IS_TEMP_LOCK);
     }
     // return true;
     if (isTempLocked) {
-      throw new RpcException(ErrorMessage.USER_IS_TEMP_LOCK);
+      throw new GrpcForbbienException(ErrorMessage.USER_IS_TEMP_LOCK);
     }
     if (!passwordMatch) {
       let currentCount = (await this.cacheProvider.get(ckey) as number);
@@ -96,7 +94,7 @@ export class AuthBaseService {
               reasonLockType: EUserReasonLockType.WRONG_PASSWORD_TO_MUCH,
             },
           });
-          throw new RpcException(reasonLock);
+          throw new GrpcForbbienException(ErrorMessage.WRONG_PASSWORD);
         } else {
           reasonLock = ErrorMessage.USER_IS_TEMP_LOCK;
           await this.cacheProvider.del(ckey);
@@ -108,54 +106,13 @@ export class AuthBaseService {
               reasonLockDesc: reasonLock,
             },
           });
-          throw new RpcException(reasonLock);
+          throw new GrpcForbbienException(ErrorMessage.USER_IS_TEMP_LOCK);
         }
       } else {
         await this.cacheProvider.set(ckey, currentCount + 1, this.tempLockDuration);
-        throw new RpcException(`Wrong password many time, attempt remaining : ${remainingCount}`);
+        throw new GrpcForbbienException(`Wrong password many time, attempt remaining : ${remainingCount}`);
       }
     }
-  }
-
-  async validateSession(uid: number, sid: string, token?: string): Promise<boolean> {
-    const sessionFromC = await this.getSession(sid);
-    if (!sessionFromC || sessionFromC?.expried_at) {
-      return false;
-    }
-    return true;
-  }
-
-  generateNewSid() {
-    return `sid:${Date.now()}`;
-  }
-
-  async createNewSession(uid: number, sid: string, refreshToken?: string, deviceId?: string): Promise<Session> {
-    const newSession = this.userRepository.session.create({
-      id: sid,
-      uid: uid,
-      refresh_token: refreshToken,
-      device_id: deviceId || undefined,
-    });
-    await this.userRepository.session.save(newSession);
-    await this.cacheProvider.storeSession(newSession);
-    return newSession;
-  }
-
-  async expriedSession(sid: string): Promise<void> {
-    await this.userRepository.session.delete({ id: sid });
-  }
-
-  async getSession(sid: string): Promise<Session> {
-    let session = await this.cacheProvider.getSession(sid);
-    if (!session) {
-      const foundSession = await this.userRepository.session.findOneBy({ id: sid });
-      if (foundSession) {
-        session = foundSession;
-      } else {
-        throw new Error('Session not found');
-      }
-    }
-    return session;
   }
 
   async getClientTokens(user: User | IUserAuth | any, sid: string): Promise<IGetTokenRes> {

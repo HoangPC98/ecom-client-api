@@ -14,7 +14,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { ILoggerService } from './adapter';
 import { ErrorType, MessageType } from './type';
-import { ApiException } from '../exeptions/api.excetion';
+import { ApiException } from '../exceptions/api.exception';
 dotenv.config();
 
 @Injectable({ scope: Scope.REQUEST })

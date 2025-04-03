@@ -1,24 +1,29 @@
 import { BeforeInsert, Column, Entity, OneToMany, OneToOne } from 'typeorm';
 import { IBaseWithIdEntity } from '../base/ibase-with-id.entity';
-import { EUserActive, EUserType } from 'src/common/enums/user.enum';
+import { EUserActive, EUserRole, EUserType } from 'src/common/enums/user.enum';
 import { ELoginType, UsrType } from 'src/common/enums/auth.enum';
 import { UserState } from 'src/common/types/auth.type';
-import { UserProfile } from './user_profile.entity';
-import { Session } from './session.entity';
+// import { UserProfile } from './user_profile.entity';
 
 @Entity()
 export class User extends IBaseWithIdEntity {
-  @Column({ type: 'varchar', nullable: true, default: EUserType.PERSONAL })
-  type: EUserType;
-
   @Column({ type: 'varchar', nullable: false })
   usr: string;
 
   @Column({ type: 'varchar', nullable: true })
   password: string;
 
+  @Column({ type: 'varchar', nullable: true, default: EUserType.PERSONAL })
+  type: EUserType;
+
+  @Column({ type: 'varchar', nullable: true, default: EUserType.PERSONAL })
+  role: EUserRole;
+
   @Column({ name: 'PIN', type: 'varchar', nullable: true })
   pin: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  fcm_token: string;
 
   @Column({ type: 'varchar', enum: UsrType, nullable: true })
   usr_type: UsrType;
@@ -40,12 +45,6 @@ export class User extends IBaseWithIdEntity {
 
   @Column({ type: 'json', nullable: true })
   state: UserState;
-
-  @OneToOne(() => UserProfile, (profile) => profile.user)
-  profile: UserProfile;
-
-  @OneToMany(() => Session, (session) => session.user)
-  sessions: Session[];
 
   @BeforeInsert()
   setInitialUser() {

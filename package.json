@@ -51,6 +51,7 @@
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
     "jsonwebtoken": "^9.0.2",
+    "nestjs-grpc-exceptions": "^0.2.2",
     "otp-generator": "^4.0.1",
     "passport": "^0.7.0",
     "passport-google-oauth2": "^0.2.0",

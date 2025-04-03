@@ -8,33 +8,27 @@ import { ErrorMessage } from 'src/common/enums/error.enum';
 import { AccType, EOtpType, UsrType } from 'src/common/enums/auth.enum';
 import { checkPhoneOrEmail } from 'src/common/utils/auth.util';
 import { OtpObjValue } from 'src/common/types/auth.type';
+import { GrpcBadRequestException, GrpcException } from 'src/common/exceptions/grpc.exception';
+import { Customer } from '../../interfaces/protos/customer/customer'
+import { User } from 'src/entities/user-entity/user.entity';
 
 dotenv.config();
 
 @Injectable()
 export class AuthService extends AuthBaseService {
-  async loginByUsr(usr: string, password: string, deviceId?: string): Promise<any> {
-    const user = await this.userRepository.findOneBy({ usr });
-    if (!user) return {
-      access_token: 'string',
-      refresh_token: 'admin',
-      fcm_token: 'asdf',
-      session_expired_in: 'string'
-    } 
-    await this.handleLoginCredit(user, password);
-    let tokens: IGetTokenRes;
-    // let checkSession = await this.userRepository.session.findOne({
-    //   where: { device_id: deviceId },
-    // });
-    // if (!checkSession) {
-    //   const sid = this.generateNewSid();
-    //   tokens = await this.getClientTokens(user, sid);
-    //   checkSession = await this.createNewSession(user.id, sid, tokens.refreshToken, deviceId);
-    // } else {
-    //   tokens = await this.getClientTokens(user, checkSession.id);
-    // }
+  async loginByUsr(dto: Customer.LoginT1Req): Promise<Customer.LoginT1Res> {
+    const user = await this.userRepository.findOneBy({ usr: dto.usr });
+    if (!user) {
+      throw new GrpcBadRequestException(ErrorMessage.USER_NOT_EXIST);
+    }
+    await this.handleLoginCredit(user, dto.password || '');
 
-    return true;
+    return {
+      status: 200,
+      uid: user.id,
+      type: user.type,
+      fcmToken: user.fcm_token
+    };
   }
 
   async loginByGoogle(email: string) {
@@ -45,25 +39,25 @@ export class AuthService extends AuthBaseService {
     console.log('REDIRECT LOGIC...');
   }
 
-  async signUpByUsr(dto: SignUpReq): Promise<ISignUpRes> {
-    const { usr, password, invite_code } = dto;
+  async signUpByUsr(dto: Customer.SignUpT1Req): Promise<Customer.SignUpT1Res> {
+    const { usr, password, inviteCode } = dto;
     const user = await this.userRepository.findOneBy({ usr: dto.usr });
-    if (user) throw new BadRequestException(ErrorMessage.USR_IS_EXISTED);
+    if (user) throw new GrpcBadRequestException(ErrorMessage.USR_IS_EXISTED);
 
-    await this.checkPhoneOrEmail(dto.usr, 1);
+    await this.checkPhoneOrEmail(usr || '', 1);
     let newUser = this.userRepository.account.create({
       usr: dto.usr,
-      password: this.setPasswordHash(dto.password),
+      password: this.setPasswordHash(password || ''),
     });
 
     newUser = await this.userRepository.account.save(newUser);
 
-    const newProfile = this.userRepository.profile.create({
-      uid: newUser.id,
-    });
-    await this.userRepository.profile.save(newProfile);
+    // const newProfile = this.userRepository.profile.create({
+    //   uid: newUser.id,
+    // });
+    // await this.userRepository.profile.save(newProfile);
     return {
-      status: true,
+      status: 200,
       uid: newUser.id,
     };
   }
@@ -78,10 +72,6 @@ export class AuthService extends AuthBaseService {
     } catch (error) {
       throw new UnauthorizedException('Invalid Token');
     }
-  }
-
-  async logout(user: IUserAuth) {
-    await this.expriedSession(user.sid);
   }
 
   async checkPhoneOrEmail(usr: string, forSignUp: any): Promise<any> {

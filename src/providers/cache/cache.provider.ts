@@ -5,7 +5,6 @@ import { plainToClass } from 'class-transformer';
 import { OtpObjValue } from 'src/common/types/auth.type';
 import { mapTimeToSecondFromStrDHM } from 'src/common/utils/time.util';
 import { AppConfigService } from 'src/configs/app.config.service';
-import { Session } from 'src/entities/user-entity/session.entity';
 
 @Injectable()
 export class CacheProvider {
@@ -49,16 +48,6 @@ export class CacheProvider {
     } else {
       this.throwException(`Cache key: ${key} not found`);
     }
-  }
-
-  async getSession(sessionId: string, uid?: number): Promise<Session> {
-    const ssFromC = await this.get(`${this.sessionCkey}${sessionId}`);
-    const session = plainToClass(Session, ssFromC);
-    return session;
-  }
-
-  async storeSession(session: Session) {
-    await this.set(`${this.sessionCkey}${session.id}`, session);
   }
 
   async storeOtp(otp: OtpObjValue): Promise<void> {

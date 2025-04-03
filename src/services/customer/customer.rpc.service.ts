@@ -1,5 +1,5 @@
 
-import { Controller } from '@nestjs/common';
+import { Controller, UseInterceptors } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GrpcMethod } from '@nestjs/microservices';
@@ -7,6 +7,7 @@ import { Observable } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { LoginByUsrPwdReq, SignUpReq } from '../auth/dto/login.dto';
 import { ILoginResp, ISignUpRes } from 'src/common/interfaces/auth.interface';
+import { Customer } from 'src/interfaces/protos/customer/customer';
 
 @Controller()
 // export class CustomerService implements ICustomerService {
@@ -16,9 +17,9 @@ export class CustomerService {
   ) { }
 
   @GrpcMethod()
-  async login(dto: LoginByUsrPwdReq): Promise<any> {
+  async login(dto: Customer.LoginT1Req): Promise<Customer.LoginT1Res> {
     console.log('DTO...Login...', dto)
-    const res = this.authService.loginByUsr(dto.usr, dto.password)
+    const res = this.authService.loginByUsr(dto)
     return res;
   }
 
@@ -33,7 +34,7 @@ export class CustomerService {
   }
 
   @GrpcMethod()
-  async signUp(dto: SignUpReq): Promise<ISignUpRes> {
+  async signUp(dto: Customer.SignUpT1Req): Promise<Customer.SignUpT1Res> {
     console.log('DTO...SignUp...', dto)
     const res = this.authService.signUpByUsr(dto)
     return res;
