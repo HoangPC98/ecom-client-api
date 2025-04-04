@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { AppConfigService } from 'src/configs/app.config.service';
 import { UsersRepository } from 'src/repositories/user.repository';
 import { UserAuthJwtDto } from './dto/token.dto';
-import { User } from 'src/entities/user-entity/user.entity';
+import { User } from 'src/database/entities/user-entity/user.entity';
 import { ErrorMessage } from 'src/common/enums/error.enum';
 import { WRONG_PASSWORD_ATTEMPT_REMAIN_CKEY, WRONG_PASSWORD_COUNT } from 'src/common/constants/cache-key.constant';
 import { CacheProvider } from 'src/providers/cache/cache.provider';

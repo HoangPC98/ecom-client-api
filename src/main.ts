@@ -5,7 +5,7 @@ import { GatewayInterceptor } from './common/interceptors/with-token.interceptor
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { MicroserviceOptions, RmqOptions, Transport } from '@nestjs/microservices';
 import { rabbitmqUri } from 'src/providers/queue';
-import { PROTO_PATH_CUSTOMER_AUTH,  PROTO_PATH_CUSTOMER } from './common/constants/index.contant';
+import { PROTO_PATH_CUSTOMER } from './common/constants/index.contant';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

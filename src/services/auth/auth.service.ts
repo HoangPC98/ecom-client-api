@@ -10,7 +10,7 @@ import { checkPhoneOrEmail } from 'src/common/utils/auth.util';
 import { OtpObjValue } from 'src/common/types/auth.type';
 import { GrpcBadRequestException, GrpcException } from 'src/common/exceptions/grpc.exception';
 import { Customer } from '../../interfaces/protos/customer/customer'
-import { User } from 'src/entities/user-entity/user.entity';
+import { User } from 'src/database/entities/user-entity/user.entity';
 
 dotenv.config();
 
@@ -26,7 +26,9 @@ export class AuthService extends AuthBaseService {
     return {
       status: 200,
       uid: user.id,
+      usr: user.usr,
       type: user.type,
+      role: user.role,
       fcmToken: user.fcm_token
     };
   }

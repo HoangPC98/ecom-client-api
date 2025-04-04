@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Strategy, VerifyCallback } from 'passport-google-oauth2';
-import { User } from 'src/entities/user-entity/user.entity';
+import { User } from 'src/database/entities/user-entity/user.entity';
 import { AppConfigService } from 'src/configs/app.config.service';
 
 @Injectable()

@@ -10,7 +10,6 @@ import { ILoginResp, ISignUpRes } from 'src/common/interfaces/auth.interface';
 import { Customer } from 'src/interfaces/protos/customer/customer';
 
 @Controller()
-// export class CustomerService implements ICustomerService {
 export class CustomerService {
   constructor(
     private readonly authService: AuthService,
@@ -19,7 +18,7 @@ export class CustomerService {
   @GrpcMethod()
   async login(dto: Customer.LoginT1Req): Promise<Customer.LoginT1Res> {
     console.log('DTO...Login...', dto)
-    const res = this.authService.loginByUsr(dto)
+    const res = await this.authService.loginByUsr(dto)
     return res;
   }
 

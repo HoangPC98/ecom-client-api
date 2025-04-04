@@ -1,7 +1,7 @@
 import { Injectable, OnModuleInit, Inject } from '@nestjs/common';
 import { Client, ClientGrpc, Transport } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
-import { grpcClientCustomerAuthServiceOptions, grpcClientCustomerServiceOptions } from './client-options';
+import { grpcClientCustomerServiceOptions } from './client-options';
 
 interface CustomerService {
   getAllNews(data: {}): Observable<any>;

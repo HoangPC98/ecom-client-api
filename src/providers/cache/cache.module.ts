@@ -12,7 +12,7 @@ import { redisStore } from 'cache-manager-redis-yet';
         store: await redisStore({
           socket: {
             host: 'localhost',
-            port: 6380,
+            port: Number(process.env.REDIS_PORT) || 6379,
           },
         }),
       }),
