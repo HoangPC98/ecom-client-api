@@ -36,17 +36,6 @@ import { CustomerModule } from './services/customer/customer.module';
     // QueueModule.subcribe([
     //   { name: MESSSAGE_SERVICE_QUEUE }
     // ]),
-    // ClientsModule.register([
-    //   {
-    //     name: 'CUSTOMER_CLIENT',
-    //     transport: Transport.GRPC,
-    //     options: {
-    //       url: 'localhost:5001',
-    //       package: 'Customer',
-    //       protoPath: PROTO_PATH_CUSTOMER_AUTH,
-    //     },
-    //   },
-    // ])
   ],
   providers: [
     {

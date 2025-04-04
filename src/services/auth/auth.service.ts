@@ -26,7 +26,9 @@ export class AuthService extends AuthBaseService {
     return {
       status: 200,
       uid: user.id,
+      usr: user.usr,
       type: user.type,
+      role: user.role,
       fcmToken: user.fcm_token
     };
   }

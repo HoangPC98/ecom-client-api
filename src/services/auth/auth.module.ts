@@ -3,14 +3,10 @@ import { JwtModule } from '@nestjs/jwt';
 import * as dotenv from 'dotenv';
 
 import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
 import { OtpProvider } from 'src/providers/otp/otp.provider';
 import { UsersRepository } from 'src/repositories/user.repository';
 import { AppConfigService } from 'src/configs/app.config.service';
-import { CacheProvider } from 'src/providers/cache/cache.provider';
 import { AuthBaseService } from './auth.base.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from 'src/entities/user-entity/user.entity';
 import { MyCacheModule } from 'src/providers/cache/cache.module';
 import { DatabaseModule } from 'src/database/database.module';
 import { QueueService } from 'src/providers/queue/queue.service';
@@ -19,7 +15,7 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
 import { AccessTokenStrategy } from './strategies/access-token.strategy';
 import { QueueMessageService } from 'src/providers/queue/queue.message.service';
 import { CustomerClientService } from '../grpc/grpc-client.service';
-import { PROTO_PATH_CUSTOMER_AUTH, PROTO_PATH_CUSTOMER} from 'src/common/constants/index.contant';
+import { PROTO_PATH_CUSTOMER} from 'src/common/constants/index.contant';
 
 dotenv.config();
 
