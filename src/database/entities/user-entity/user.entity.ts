@@ -16,7 +16,7 @@ export class User extends IBaseWithIdEntity {
   @Column({ type: 'varchar', nullable: true, default: EUserType.PERSONAL })
   type: EUserType;
 
-  @Column({ type: 'varchar', nullable: true, default: EUserType.PERSONAL })
+  @Column({ type: 'varchar', nullable: true, default: EUserRole.USER_LV_0 })
   role: EUserRole;
 
   @Column({ name: 'PIN', type: 'varchar', nullable: true })
