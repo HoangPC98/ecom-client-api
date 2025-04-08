@@ -10,7 +10,7 @@ import { PROTO_PATH_CUSTOMER } from './common/constants/index.contant';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const appName = 'GatewayAPI';
-  const appPort = process.env.REST_API_PORT || 8080;
+  const appPort = process.env.APP_PORT || 8080;
   const rpcEndpoint =  '0.0.0.0:5001';
   const options = {
     origin: '*',
