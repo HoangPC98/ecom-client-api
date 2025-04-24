@@ -31,6 +31,6 @@ volumes:
   app:
     external: true
 
-networks:
-  ecom_common:
-    external: true
+# networks:
+#   ecom_common:
+#     external: true
