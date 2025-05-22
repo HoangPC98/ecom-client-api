@@ -11,6 +11,8 @@ import { OtpObjValue } from 'src/common/types/auth.type';
 import { GrpcBadRequestException, GrpcException } from 'src/common/exceptions/grpc.exception';
 import { Customer } from '../../interfaces/protos/customer/customer'
 import { User } from 'src/database/entities/user-entity/user.entity';
+import { ALL_USER_BASE_INFO } from 'src/common/constants/cache-key.constant';
+import { UserBaseInfo } from 'src/common/types/user.type';
 
 dotenv.config();
 
@@ -43,16 +45,25 @@ export class AuthService extends AuthBaseService {
 
   async signUpByUsr(dto: Customer.SignUpT1Req): Promise<Customer.SignUpT1Res> {
     const { usr, password, inviteCode } = dto;
-    const user = await this.userRepository.findOneBy({ usr: dto.usr });
-    if (user) throw new GrpcBadRequestException(ErrorMessage.USR_IS_EXISTED);
+    const allUserBase = await this.getAllUserBaseInfo();
+    const userExisted = allUserBase.find(user => user.usr == usr)
+    if (userExisted) throw new GrpcBadRequestException(ErrorMessage.USR_IS_EXISTED);
 
     await this.checkPhoneOrEmail(usr || '', 1);
+    const userFullname =  (dto.first_name || dto.last_name) ? `${dto.first_name} ${dto.last_name}` : dto.usr;
     let newUser = this.userRepository.account.create({
       usr: dto.usr,
+      full_name: userFullname,
       password: this.setPasswordHash(password || ''),
     });
 
     newUser = await this.userRepository.account.save(newUser);
+    allUserBase.push({
+      id: newUser.id,
+      usr: dto.usr || 'User',
+      full_name: userFullname,
+    })
+    await this.cacheProvider.set(ALL_USER_BASE_INFO, allUserBase);
 
     // const newProfile = this.userRepository.profile.create({
     //   uid: newUser.id,
@@ -62,6 +73,25 @@ export class AuthService extends AuthBaseService {
       status: 200,
       uid: newUser.id,
     };
+  }
+
+  async getAllUserBaseInfo(): Promise<UserBaseInfo[]> {
+    const userFromCache = await this.cacheProvider.get(ALL_USER_BASE_INFO) as unknown as UserBaseInfo[];
+    if (!userFromCache) {
+      const users = await this.userRepository
+        .createQueryBuilder('user')
+        .select(['user.id', 'user.usr', 'user.full_name'])
+        .getRawMany()
+        .then(results => results.map(user => ({
+          id: user.user_id,
+          usr: user.user_usr,
+          full_name: user.user_full_name
+        })));
+      console.log('User...', users);
+      return users;
+    }
+    else
+      return userFromCache;
   }
 
   async getRefreshToken(refreshToken: string): Promise<GetRefreshTokenResp> {

@@ -4,7 +4,7 @@
 //     name = 'Generate10MilionsUser1743690727310';
 //     public async up(queryRunner: QueryRunner): Promise<void> {
 //         const start_time = new Date()
-//         for (let i = 1001000; i < 10000000; i++) {
+//         for (let i = 0; i < 10000000; i++) {
 //             let phoneNum = `032000${i}`;
 //             let usr = i % 2 == 0 ? phoneNum : `usr${phoneNum}@gmail.com`
 //             let usr_type = i % 2 == 0 ? 'phone_number' : 'email'

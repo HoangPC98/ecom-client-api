@@ -37,6 +37,8 @@ export namespace Customer {
         usr?: string;
         password?: string;
         inviteCode?: string;
+        first_name?: string;
+        last_name?: string;
     }
     export interface SignUpT1Res {
         status?: number;
